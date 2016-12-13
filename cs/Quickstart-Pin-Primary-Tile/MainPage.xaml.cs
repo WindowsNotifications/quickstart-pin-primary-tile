@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.StartScreen;
@@ -33,62 +34,83 @@ namespace Quickstart_Pin_Primary_Tile
 
         private async void ShowLiveTileTipIfNeeded()
         {
-            // You should  check if you've already shown this tip before,
-            // and if so, don't show the tip to the user again.
-            if (ApplicationData.Current.LocalSettings.Values.Any(i => i.Key.Equals("ShownLiveTileTip")))
+            try
             {
-                // But for purposes of this Quickstart, we'll always show the tip
-                //return;
+                // You should  check if you've already shown this tip before,
+                // and if so, don't show the tip to the user again.
+                if (ApplicationData.Current.LocalSettings.Values.Any(i => i.Key.Equals("ShownLiveTileTip")))
+                {
+                    // But for purposes of this Quickstart, we'll always show the tip
+                    //return;
+                }
+
+                // Store that you've shown this tip, so you don't show it again
+                ApplicationData.Current.LocalSettings.Values["ShownLiveTileTip"] = true;
+
+                // If Start screen manager API's aren't present
+                if (!ApiInformation.IsTypePresent("Windows.UI.StartScreen.StartScreenManager"))
+                {
+                    ShowMessage("StartScreenManager API isn't present on this build.");
+                    return;
+                }
+
+                // Get your own app list entry (which is the first entry assuming you have a single-app package)
+                var appListEntry = (await Package.Current.GetAppListEntriesAsync())[0];
+
+                // Get the Start screen manager
+                var startScreenManager = StartScreenManager.GetDefault();
+
+                // Check if Start supports pinning your app
+                bool supportsPin = startScreenManager.SupportsAppListEntry(appListEntry);
+
+                // If Start doesn't support pinning, don't show the tip
+                if (!supportsPin)
+                {
+                    ShowMessage("Start doesn't support pinning.");
+                    return;
+                }
+
+                // Check if you're pinned
+                bool isPinned = await StartScreenManager.GetDefault().ContainsAppListEntryAsync(appListEntry);
+
+                // If the tile is already pinned, don't show the tip
+                if (isPinned)
+                {
+                    ShowMessage("The tile is already pinned to Start!");
+                    return;
+                }
+
+                // Otherwise, show the tip
+                FlyoutPinTileTip.ShowAt(ButtonShowTip);
             }
-
-            // Store that you've shown this tip, so you don't show it again
-            ApplicationData.Current.LocalSettings.Values["ShownLiveTileTip"] = true;
-
-            // Get your own app list entry (which is the first entry assuming you have a single-app package)
-            var appListEntry = (await Package.Current.GetAppListEntriesAsync())[0];
-
-            // Get the Start screen manager
-            var startScreenManager = StartScreenManager.GetDefault();
-
-            // Check if Start supports pinning your app
-            bool supportsPin = startScreenManager.SupportsAppListEntry(appListEntry);
-
-            // If Start doesn't support pinning, don't show the tip
-            if (!supportsPin)
+            catch (Exception ex)
             {
-                ShowMessage("Start doesn't support pinning.");
-                return;
+                ShowMessage(ex.ToString());
             }
-
-            // Check if you're pinned
-            bool isPinned = await StartScreenManager.GetDefault().ContainsAppListEntryAsync(appListEntry);
-
-            // If the tile is already pinned, don't show the tip
-            if (isPinned)
-            {
-                ShowMessage("The tile is already pinned to Start!");
-                return;
-            }
-
-            // Otherwise, show the tip
-            FlyoutPinTileTip.ShowAt(ButtonShowTip);
         }
 
         private async void ButtonPinTile_Click(object sender, RoutedEventArgs e)
         {
-            // Get your own app list entry (which is the first entry assuming you have a single-app package)
-            var appListEntry = (await Package.Current.GetAppListEntriesAsync())[0];
-
-            // And pin your app
-            bool didPin = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(appListEntry);
-
-            if (didPin)
+            try
             {
-                ShowMessage("Success! Tile was pinned!");
+                // Get your own app list entry (which is the first entry assuming you have a single-app package)
+                var appListEntry = (await Package.Current.GetAppListEntriesAsync())[0];
+
+                // And pin your app
+                bool didPin = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(appListEntry);
+
+                if (didPin)
+                {
+                    ShowMessage("Success! Tile was pinned!");
+                }
+                else
+                {
+                    ShowMessage("Tile was NOT pinned, did you click no on the dialog?");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ShowMessage("Tile was NOT pinned, did you click no on the dialog?");
+                ShowMessage(ex.ToString());
             }
         }
 
