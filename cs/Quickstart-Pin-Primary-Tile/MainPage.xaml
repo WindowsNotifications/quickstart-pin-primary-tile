@@ -1,0 +1,74 @@
+﻿<Page
+    x:Class="Quickstart_Pin_Primary_Tile.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Quickstart_Pin_Primary_Tile"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+
+        <Flyout x:Name="FlyoutPinTileTip">
+            <StackPanel>
+                <TextBlock
+                    Text="Try out our awesome Live Tile!"/>
+                <Button
+                    x:Name="ButtonPinTile"
+                    Content="Pin Primary Tile"
+                    Click="ButtonPinTile_Click"
+                    Margin="0,6,0,0"/>
+            </StackPanel>
+        </Flyout>
+        
+    </Page.Resources>
+
+    <ScrollViewer Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <StackPanel Margin="24">
+
+            <TextBlock
+                Text="Quickstart: Pin your primary tile"
+                Style="{StaticResource TitleTextBlockStyle}"
+                TextWrapping="Wrap"/>
+
+            <RichTextBlock Margin="0,12,0,0">
+                <Paragraph>
+                    If your app has an awesome live tile that you want to promote, with the Creators Update you can finally ask the user to pin your primary tile, just like you can pin secondary tiles.
+                </Paragraph>
+                <Paragraph />
+                <Paragraph>This app illustrates how you would show a tip to the user about the primary tile, and then request to pin the primary tile.</Paragraph>
+            </RichTextBlock>
+
+            <Button
+                x:Name="ButtonShowTip"
+                Content="Click to show tip about live tile"
+                Click="ButtonShowTip_Click"
+                HorizontalAlignment="Stretch"
+                Margin="0,12,0,0">
+
+            </Button>
+
+            <RichTextBlock Margin="0,12,0,0">
+                <Paragraph>The button above will do a few things...</Paragraph>
+                <Paragraph />
+                <Paragraph>
+                    - Checks whether Start supports pinning
+                </Paragraph>
+                <Paragraph>
+                    - Checks whether the tile is already pinned
+                </Paragraph>
+                <Paragraph>
+                    - If those passed, displays a tip to the user about the live tile
+                </Paragraph>
+                <Paragraph>
+                    - If the user clicks the button on the tip, calls the API to request to pin the primary tile
+                </Paragraph>
+            </RichTextBlock>
+
+        </StackPanel>
+
+
+
+    </ScrollViewer>
+</Page>
